@@ -5,7 +5,6 @@ import lombok.Data;
 
 @Data
 public class BookingRequest {
-    @NotNull
     private Long courtId;
 
     @NotNull

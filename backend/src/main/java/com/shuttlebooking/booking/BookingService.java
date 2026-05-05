@@ -44,15 +44,18 @@ public class BookingService {
             throw new BusinessException("Time slot is not available");
         }
 
-        Court court = courtRepository.findById(req.getCourtId())
-                .orElseThrow(() -> new BusinessException("Court not found"));
-
-        if (slot.getCourt() == null) {
-            throw new BusinessException("Time slot does not have an assigned court");
-        }
-
-        if (!slot.getCourt().getId().equals(court.getId())) {
-            throw new BusinessException("Time slot does not belong to this court");
+        // Derive court from request, time slot, or activity
+        Court court;
+        if (req.getCourtId() != null) {
+            court = courtRepository.findById(req.getCourtId())
+                    .orElseThrow(() -> new BusinessException("Court not found"));
+            if (slot.getCourt() != null && !slot.getCourt().getId().equals(court.getId())) {
+                throw new BusinessException("Time slot does not belong to this court");
+            }
+        } else if (slot.getCourt() != null) {
+            court = slot.getCourt();
+        } else {
+            throw new BusinessException("No court assigned to this time slot");
         }
 
         Activity activity = null;
