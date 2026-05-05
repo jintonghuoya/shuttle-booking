@@ -2,6 +2,7 @@ package com.shuttlebooking.activity;
 
 import com.shuttlebooking.common.BusinessException;
 import com.shuttlebooking.common.SlotStatus;
+import java.util.stream.StreamSupport;
 import com.shuttlebooking.court.Court;
 import com.shuttlebooking.court.CourtRepository;
 import com.shuttlebooking.organization.OrgMemberRepository;
@@ -93,7 +94,8 @@ class ActivityServiceTest {
         assertEquals(venue, result.getVenue());
         assertEquals(court, result.getCourt());
         // 1 day * 2 hours = 2 slots
-        verify(timeSlotRepository).saveAll(argThat(slots -> slots.size() == 2));
+        verify(timeSlotRepository).saveAll(argThat(slots ->
+                StreamSupport.stream(slots.spliterator(), false).count() == 2));
     }
 
     @Test
