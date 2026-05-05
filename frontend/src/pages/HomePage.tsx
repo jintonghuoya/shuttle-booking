@@ -17,12 +17,43 @@ L.Icon.Default.mergeOptions({
 // Singapore default center
 const SINGAPORE = { lat: 1.3521, lng: 103.8198 };
 
+// Blue dot icon for user's current position
+const userIcon = L.divIcon({
+  className: '',
+  html: `<div style="
+    width: 16px; height: 16px;
+    background: #3b82f6;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(59,130,246,0.5);
+  "></div>`,
+  iconSize: [16, 16],
+  iconAnchor: [8, 8],
+});
+
 function CenterUpdater({ center }: { center: { lat: number; lng: number } }) {
   const map = useMap();
   useEffect(() => {
     map.setView(center, map.getZoom());
   }, [center, map]);
   return null;
+}
+
+function LocateButton({ onLocate }: { onLocate: () => void }) {
+  const map = useMap();
+  return (
+    <button
+      onClick={() => { onLocate(); map.locate({ setView: true, maxZoom: 14 }); }}
+      className="absolute top-2 right-2 z-[1000] bg-white rounded-lg shadow-md px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 transition flex items-center gap-1.5"
+      title="Center on my location"
+    >
+      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+      </svg>
+      My Location
+    </button>
+  );
 }
 
 export default function HomePage() {
@@ -65,6 +96,18 @@ export default function HomePage() {
 
   const navigate = useNavigate();
   const center = userLocation || SINGAPORE;
+
+  const handleLocate = () => {
+    if (!navigator.geolocation) return;
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const loc = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        setUserLocation(loc);
+        fetchVenues(loc.lat, loc.lng);
+      },
+      () => alert('Unable to get your location')
+    );
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -111,6 +154,12 @@ export default function HomePage() {
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
             <CenterUpdater center={center} />
+            <LocateButton onLocate={handleLocate} />
+            {userLocation && (
+              <Marker position={[userLocation.lat, userLocation.lng]} icon={userIcon}>
+                <Popup><span className="text-sm font-medium">You are here</span></Popup>
+              </Marker>
+            )}
             {venues.filter(v => v.latitude && v.longitude).map(venue => (
               <Marker
                 key={venue.id}
