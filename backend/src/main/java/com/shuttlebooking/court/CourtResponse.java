@@ -13,9 +13,13 @@ public class CourtResponse {
     private String name;
     private BigDecimal pricePerHourSgd;
     private boolean active;
+    private Long venueId;
+    private String venueName;
 
     public static CourtResponse from(Court court) {
         return new CourtResponse(court.getId(), court.getCourtNumber(), court.getName(),
-                court.getPricePerHourSgd(), court.isActive());
+                court.getPricePerHourSgd(), court.isActive(),
+                court.getVenue() != null ? court.getVenue().getId() : null,
+                court.getVenue() != null ? court.getVenue().getName() : null);
     }
 }

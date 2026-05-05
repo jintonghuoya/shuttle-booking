@@ -43,6 +43,7 @@ export default function OrgDetailPage() {
       navigate('/login');
       return;
     }
+    if (isFollowing && !confirm('Unfollow this organization?')) return;
     setFollowLoading(true);
     try {
       await client.post(`/orgs/${id}/follow`);
@@ -77,13 +78,10 @@ export default function OrgDetailPage() {
             <button
               onClick={handleFollow}
               disabled={followLoading}
-              className={`px-4 py-2 rounded-lg text-sm font-medium transition ${
-                isFollowing
-                  ? 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
-              }`}
+              className="text-2xl transition hover:scale-110"
+              title={isFollowing ? 'Unfollow organization' : 'Follow organization'}
             >
-              {followLoading ? '...' : isFollowing ? 'Unfollow' : 'Follow'}
+              {isFollowing ? '❤️' : '\u{1F5A4}'}
             </button>
           </div>
         </div>
