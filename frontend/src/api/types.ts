@@ -25,8 +25,6 @@ export interface Court {
   name: string;
   pricePerHourSgd: number;
   active: boolean;
-  venueId?: number;
-  venueName?: string;
 }
 
 export interface TimeSlot {
@@ -103,9 +101,9 @@ export interface UserFollowing {
   createdAt: string;
 }
 
-export interface CourtFollowing {
+export interface VenueFollowing {
   id: number;
-  court: Court;
+  venue: Venue;
   createdAt: string;
 }
 

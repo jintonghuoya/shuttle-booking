@@ -1,31 +1,31 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import client from '../api/client';
-import type { UserFollowing, CourtFollowing } from '../api/types';
+import type { UserFollowing, VenueFollowing } from '../api/types';
 import { useAuth } from '../context/AuthContext';
 
 export default function FollowingPage() {
   const { isAuthenticated } = useAuth();
-  const [tab, setTab] = useState<'orgs' | 'courts'>('orgs');
+  const [tab, setTab] = useState<'orgs' | 'venues'>('orgs');
   const [orgFollowing, setOrgFollowing] = useState<UserFollowing[]>([]);
-  const [courtFollowing, setCourtFollowing] = useState<CourtFollowing[]>([]);
+  const [venueFollowing, setVenueFollowing] = useState<VenueFollowing[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!isAuthenticated) return;
     Promise.all([
       client.get('/user/following'),
-      client.get('/user/following/courts'),
-    ]).then(([orgRes, courtRes]) => {
+      client.get('/user/following/venues'),
+    ]).then(([orgRes, venueRes]) => {
       setOrgFollowing(orgRes.data.data || []);
-      setCourtFollowing(courtRes.data.data || []);
+      setVenueFollowing(venueRes.data.data || []);
     }).finally(() => setLoading(false));
   }, [isAuthenticated]);
 
   if (!isAuthenticated) {
     return (
       <div className="min-h-screen flex items-center justify-center">
-        <p>Please <Link to="/login" className="text-blue-600">sign in</Link> to view your followed organizations and courts.</p>
+        <p>Please <Link to="/login" className="text-blue-600">sign in</Link> to view your followed organizations and venues.</p>
       </div>
     );
   }
@@ -51,12 +51,12 @@ export default function FollowingPage() {
             Organizations ({orgFollowing.length})
           </button>
           <button
-            onClick={() => setTab('courts')}
+            onClick={() => setTab('venues')}
             className={`flex-1 py-2 rounded-md text-sm font-medium transition ${
-              tab === 'courts' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
+              tab === 'venues' ? 'bg-white shadow text-gray-900' : 'text-gray-600 hover:text-gray-900'
             }`}
           >
-            Courts ({courtFollowing.length})
+            Venues ({venueFollowing.length})
           </button>
         </div>
 
@@ -92,23 +92,23 @@ export default function FollowingPage() {
             </div>
           )
         ) : (
-          courtFollowing.length === 0 ? (
-            <p className="text-gray-400 text-center">You are not following any courts yet.</p>
+          venueFollowing.length === 0 ? (
+            <p className="text-gray-400 text-center">You are not following any venues yet.</p>
           ) : (
             <div className="space-y-3">
-              {courtFollowing.map(f => (
+              {venueFollowing.map(f => (
                 <Link
                   key={f.id}
-                  to={`/venues/${f.court.venueId}`}
+                  to={`/venues/${f.venue.id}`}
                   className="block bg-white rounded-lg shadow-sm p-4 border border-gray-200 hover:border-blue-300 transition"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600 font-bold">
-                      {f.court.courtNumber}
+                    <div className="w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center text-green-600 font-bold text-sm">
+                      {f.venue.name.charAt(0)}
                     </div>
                     <div>
-                      <h3 className="font-medium text-blue-600">Court {f.court.courtNumber}</h3>
-                      <p className="text-sm text-gray-500">{f.court.venueName || 'Unknown venue'} · ${f.court.pricePerHourSgd}/hr</p>
+                      <h3 className="font-medium text-blue-600">{f.venue.name}</h3>
+                      <p className="text-sm text-gray-500">{f.venue.address}</p>
                     </div>
                     <span className="ml-auto text-xl">❤️</span>
                   </div>
