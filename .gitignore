@@ -1,0 +1,29 @@
+# Dependencies
+node_modules/
+target/
+
+# Build output
+dist/
+*.class
+
+# Environment
+.env
+.env.local
+
+# IDE
+.idea/
+.vscode/
+*.iml
+*.sw?
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Docker runtime data
+.backend/
+frontend/.runtime/
+.runtime/

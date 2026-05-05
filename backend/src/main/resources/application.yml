@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: shuttle-booking
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:mysql://localhost:3306/shuttle_booking?serverTimezone=Asia/Singapore}
+    username: ${SPRING_DATASOURCE_USERNAME:shuttle}
+    password: ${SPRING_DATASOURCE_PASSWORD:shuttlepass}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    connect-retries: 10
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api/v1
+
+jwt:
+  secret: ${JWT_SECRET:your-256-bit-secret-key-change-in-production}
+  expiration: 86400000
+
+stripe:
+  secret-key: ${STRIPE_SECRET_KEY}
+  webhook-secret: ${STRIPE_WEBHOOK_SECRET}
+
+google:
+  maps:
+    api-key: ${GOOGLE_MAPS_API_KEY}
