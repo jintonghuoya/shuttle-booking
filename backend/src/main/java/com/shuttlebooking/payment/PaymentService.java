@@ -46,8 +46,8 @@ public class PaymentService {
 
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
-                .setSuccessUrl("http://localhost:3000/bookings?payment=success&ref=" + booking.getBookingRef())
-                .setCancelUrl("http://localhost:3000/venues/" + booking.getVenue().getId() + "?payment=cancelled")
+                .setSuccessUrl("http://localhost:3001/bookings?payment=success&ref=" + booking.getBookingRef())
+                .setCancelUrl("http://localhost:3001/venues/" + booking.getVenue().getId() + "?payment=cancelled")
                 .addLineItem(SessionCreateParams.LineItem.builder()
                         .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                                 .setCurrency("sgd")
@@ -69,6 +69,7 @@ public class PaymentService {
                     .bookingId(bookingId)
                     .stripeSessionId(session.getId())
                     .amount(booking.getTotalAmount())
+                    .currency("SGD")
                     .status(PaymentStatus.PENDING)
                     .build();
             paymentRepository.save(payment);

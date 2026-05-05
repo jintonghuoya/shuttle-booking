@@ -30,6 +30,6 @@ public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
     @Modifying
     @Transactional
     @Query("UPDATE TimeSlot t SET t.status = 'AVAILABLE', t.heldUntil = NULL " +
-           "WHERE t.status = 'HELD' AND t.heldUntil < :now")
+           "WHERE t.status = 'HELD' AND (t.heldUntil < :now OR t.heldUntil IS NULL)")
     int expireHeldSlots(Instant now);
 }
