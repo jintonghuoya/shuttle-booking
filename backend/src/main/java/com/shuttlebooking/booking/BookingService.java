@@ -47,6 +47,10 @@ public class BookingService {
         Court court = courtRepository.findById(req.getCourtId())
                 .orElseThrow(() -> new BusinessException("Court not found"));
 
+        if (slot.getCourt() == null) {
+            throw new BusinessException("Time slot does not have an assigned court");
+        }
+
         if (!slot.getCourt().getId().equals(court.getId())) {
             throw new BusinessException("Time slot does not belong to this court");
         }

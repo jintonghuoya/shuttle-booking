@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import client from '../api/client';
 import type { Venue, Activity } from '../api/types';
 
@@ -36,6 +37,32 @@ export default function VenueDetailPage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
+        {/* Location map */}
+        {venue.latitude && venue.longitude && (
+          <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+            <MapContainer
+              center={[venue.latitude, venue.longitude]}
+              zoom={15}
+              className="h-64 w-full"
+              scrollWheelZoom={false}
+              dragging={false}
+            >
+              <TileLayer
+                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              />
+              <Marker position={[venue.latitude, venue.longitude]}>
+                <Popup>
+                  <div className="text-sm">
+                    <p className="font-medium">{venue.name}</p>
+                    <p className="text-gray-500">{venue.address}</p>
+                  </div>
+                </Popup>
+              </Marker>
+            </MapContainer>
+          </div>
+        )}
+
         {venue.description && <p className="mb-4 text-gray-600">{venue.description}</p>}
         {venue.phone && <p className="mb-4 text-gray-600">Phone: {venue.phone}</p>}
 

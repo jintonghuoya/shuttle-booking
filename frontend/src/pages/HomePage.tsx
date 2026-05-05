@@ -1,8 +1,29 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet';
+import L from 'leaflet';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
 import type { Venue } from '../api/types';
+
+// Fix Leaflet default marker icon path issue with bundlers
+delete (L.Icon.Default.prototype as any)._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
+  iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
+  shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
+});
+
+// Singapore default center
+const SINGAPORE = { lat: 1.3521, lng: 103.8198 };
+
+function CenterUpdater({ center }: { center: { lat: number; lng: number } }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+}
 
 export default function HomePage() {
   const { isAuthenticated, logout, hasRole } = useAuth();
@@ -42,6 +63,9 @@ export default function HomePage() {
     }
   }, [fetchVenues]);
 
+  const navigate = useNavigate();
+  const center = userLocation || SINGAPORE;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
@@ -74,13 +98,39 @@ export default function HomePage() {
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6">
-        {/* Map placeholder */}
-        <div className="bg-white rounded-lg shadow-sm h-64 flex items-center justify-center text-gray-400 mb-6">
-          <div className="text-center">
-            <p className="text-lg font-medium">Map View</p>
-            <p className="text-sm">Google Maps will render here</p>
-            <p className="text-xs mt-2">Center: {userLocation ? `${userLocation.lat.toFixed(4)}, ${userLocation.lng.toFixed(4)}` : 'Singapore'}</p>
-          </div>
+        {/* Map */}
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <MapContainer
+            center={[center.lat, center.lng]}
+            zoom={13}
+            className="h-64 w-full"
+            scrollWheelZoom={false}
+          >
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <CenterUpdater center={center} />
+            {venues.filter(v => v.latitude && v.longitude).map(venue => (
+              <Marker
+                key={venue.id}
+                position={[venue.latitude, venue.longitude]}
+                eventHandlers={{
+                  click: () => navigate(`/venues/${venue.id}`),
+                }}
+              >
+                <Popup>
+                  <div className="text-sm">
+                    <p className="font-medium">{venue.name}</p>
+                    <p className="text-gray-500">{venue.address}</p>
+                    {venue.distanceKm != null && (
+                      <p className="text-blue-600 mt-1">{venue.distanceKm.toFixed(1)} km away</p>
+                    )}
+                  </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
         </div>
 
         {/* Venue list */}
