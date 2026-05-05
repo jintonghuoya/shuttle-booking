@@ -5,6 +5,7 @@ import com.shuttlebooking.common.BookingStatus;
 import com.shuttlebooking.common.SlotStatus;
 import com.shuttlebooking.court.Court;
 import com.shuttlebooking.court.CourtRepository;
+import com.shuttlebooking.payment.PaymentService;
 import com.shuttlebooking.timeslot.TimeSlot;
 import com.shuttlebooking.timeslot.TimeSlotRepository;
 import com.shuttlebooking.user.User;
@@ -39,6 +40,8 @@ class BookingServiceTest {
     private CourtRepository courtRepository;
     @Mock
     private VenueRepository venueRepository;
+    @Mock
+    private PaymentService paymentService;
 
     @InjectMocks
     private BookingService bookingService;
@@ -58,7 +61,7 @@ class BookingServiceTest {
 
     @Test
     void createBooking_success() {
-        when(timeSlotRepository.findById(1L)).thenReturn(Optional.of(slot));
+        when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
         when(courtRepository.findById(1L)).thenReturn(Optional.of(court));
         when(bookingRepository.save(any())).thenAnswer(inv -> {
             Booking b = inv.getArgument(0);
@@ -84,7 +87,7 @@ class BookingServiceTest {
     @Test
     void createBooking_slotNotAvailable_throwsException() {
         slot.setStatus(SlotStatus.BOOKED);
-        when(timeSlotRepository.findById(1L)).thenReturn(Optional.of(slot));
+        when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
 
         BookingRequest req = new BookingRequest();
         req.setCourtId(1L);
@@ -96,7 +99,7 @@ class BookingServiceTest {
     @Test
     void createBooking_courtMismatch_throwsException() {
         Court otherCourt = Court.builder().id(99L).venue(venue).build();
-        when(timeSlotRepository.findById(1L)).thenReturn(Optional.of(slot));
+        when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
         when(courtRepository.findById(99L)).thenReturn(Optional.of(otherCourt));
 
         BookingRequest req = new BookingRequest();
