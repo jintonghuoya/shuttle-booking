@@ -25,7 +25,7 @@ public class TimeSlot {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_id", nullable = false)
+    @JoinColumn(name = "court_id")
     private Court court;
 
     @Column(name = "slot_date", nullable = false)

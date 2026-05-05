@@ -1,0 +1,2 @@
+ALTER TABLE `activities` MODIFY COLUMN `court_id` BIGINT NULL;
+ALTER TABLE `time_slots` MODIFY COLUMN `court_id` BIGINT NULL;

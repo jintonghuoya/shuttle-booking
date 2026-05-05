@@ -33,7 +33,7 @@ public class Activity {
     private Venue venue;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_id", nullable = false)
+    @JoinColumn(name = "court_id")
     private Court court;
 
     @Column(nullable = false)

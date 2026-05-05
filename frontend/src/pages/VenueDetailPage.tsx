@@ -56,7 +56,7 @@ export default function VenueDetailPage() {
                   <div>
                     <h3 className="font-medium text-blue-600">{activity.title}</h3>
                     <p className="text-sm text-gray-500 mt-1">
-                      {activity.org?.name} &middot; Court {activity.courtNumber}
+                      {activity.org?.name}{activity.courtNumber ? ` · Court ${activity.courtNumber}` : ''}
                     </p>
                     <p className="text-sm text-gray-500">
                       {activity.startDate} ~ {activity.endDate} &middot; {activity.startHour}:00 - {activity.endHour}:00

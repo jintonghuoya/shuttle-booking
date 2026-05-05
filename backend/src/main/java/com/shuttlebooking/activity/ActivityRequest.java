@@ -17,7 +17,6 @@ public class ActivityRequest {
     @NotNull
     private Long venueId;
 
-    @NotNull
     private Long courtId;
 
     @NotBlank

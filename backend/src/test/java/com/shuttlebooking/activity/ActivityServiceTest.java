@@ -172,6 +172,25 @@ class ActivityServiceTest {
     }
 
     @Test
+    void create_withoutCourt_success() {
+        when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
+        when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
+        when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
+        request.setCourtId(null);
+        when(activityRepository.save(any())).thenAnswer(inv -> {
+            Activity a = inv.getArgument(0);
+            a.setId(2L);
+            return a;
+        });
+
+        Activity result = activityService.create(1L, request, user);
+
+        assertNotNull(result);
+        assertNull(result.getCourt());
+        assertEquals("Test Activity", result.getTitle());
+    }
+
+    @Test
     void getById_found() {
         Activity activity = Activity.builder().id(1L).title("Test").org(org).build();
         when(activityRepository.findById(1L)).thenReturn(Optional.of(activity));

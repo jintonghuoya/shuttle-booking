@@ -46,15 +46,16 @@ public class ActivityService {
                 .filter(Venue::isActive)
                 .orElseThrow(() -> new BusinessException("Venue not found"));
 
-        Court court = courtRepository.findById(req.getCourtId())
-                .orElseThrow(() -> new BusinessException("Court not found"));
-
-        if (!court.getVenue().getId().equals(venue.getId())) {
-            throw new BusinessException("Court does not belong to this venue");
-        }
-
-        if (!court.isActive()) {
-            throw new BusinessException("Court is not active");
+        Court court = null;
+        if (req.getCourtId() != null) {
+            court = courtRepository.findById(req.getCourtId())
+                    .orElseThrow(() -> new BusinessException("Court not found"));
+            if (!court.getVenue().getId().equals(venue.getId())) {
+                throw new BusinessException("Court does not belong to this venue");
+            }
+            if (!court.isActive()) {
+                throw new BusinessException("Court is not active");
+            }
         }
 
         if (req.getStartDate().isAfter(req.getEndDate())) {
