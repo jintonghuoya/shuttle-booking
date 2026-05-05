@@ -1,6 +1,5 @@
 package com.shuttlebooking.activity;
 
-import com.shuttlebooking.court.Court;
 import com.shuttlebooking.organization.Organization;
 import com.shuttlebooking.venue.Venue;
 import jakarta.persistence.*;
@@ -8,6 +7,7 @@ import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -32,9 +32,8 @@ public class Activity {
     @JoinColumn(name = "venue_id", nullable = false)
     private Venue venue;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_id")
-    private Court court;
+    @Column(name = "court_description")
+    private String courtDescription;
 
     @Column(nullable = false)
     private String title;
@@ -56,6 +55,9 @@ public class Activity {
 
     @Column(nullable = false, length = 20)
     private String status = "PUBLISHED";
+
+    @Column(name = "price_per_hour_sgd", nullable = false)
+    private BigDecimal pricePerHourSgd;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

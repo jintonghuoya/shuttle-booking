@@ -13,7 +13,6 @@ import FollowingPage from './pages/FollowingPage';
 import SubmitVenuePage from './pages/organizer/SubmitVenuePage';
 import MyVenuesPage from './pages/organizer/MyVenuesPage';
 import EditVenuePage from './pages/organizer/EditVenuePage';
-import AddCourtPage from './pages/organizer/AddCourtPage';
 import OrgListPage from './pages/organizer/OrgListPage';
 import OrgManagePage from './pages/organizer/OrgDetailPage';
 import CreateOrgPage from './pages/organizer/CreateOrgPage';
@@ -51,7 +50,6 @@ function App() {
             <Route path="/organizer/venues" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><MyVenuesPage /></ProtectedRoute>} />
             <Route path="/organizer/venues/new" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><SubmitVenuePage /></ProtectedRoute>} />
             <Route path="/organizer/venues/:id/edit" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><EditVenuePage /></ProtectedRoute>} />
-            <Route path="/organizer/venues/:venueId/courts/new" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><AddCourtPage /></ProtectedRoute>} />
             <Route path="/organizer/orgs" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><OrgListPage /></ProtectedRoute>} />
             <Route path="/organizer/orgs/new" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><CreateOrgPage /></ProtectedRoute>} />
             <Route path="/organizer/orgs/:id" element={<ProtectedRoute requiredRole="ROLE_ORGANIZER"><OrgManagePage /></ProtectedRoute>} />

@@ -1,10 +1,10 @@
 package com.shuttlebooking.booking;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.shuttlebooking.activity.Activity;
+import com.shuttlebooking.activity.ActivityRepository;
 import com.shuttlebooking.auth.LoginRequest;
 import com.shuttlebooking.common.Role;
-import com.shuttlebooking.court.Court;
-import com.shuttlebooking.court.CourtRepository;
 import com.shuttlebooking.timeslot.TimeSlot;
 import com.shuttlebooking.timeslot.TimeSlotRepository;
 import com.shuttlebooking.common.SlotStatus;
@@ -39,7 +39,7 @@ class BookingIntegrationTest {
     @Autowired private MockMvc mockMvc;
     @Autowired private UserRepository userRepository;
     @Autowired private VenueRepository venueRepository;
-    @Autowired private CourtRepository courtRepository;
+    @Autowired private ActivityRepository activityRepository;
     @Autowired private TimeSlotRepository timeSlotRepository;
     @Autowired private PasswordEncoder passwordEncoder;
     @Autowired private ObjectMapper objectMapper;
@@ -59,20 +59,23 @@ class BookingIntegrationTest {
         Venue venue = Venue.builder().name("Test Venue").address("addr").latitude(BigDecimal.ONE).longitude(BigDecimal.ONE).active(true).submittedBy(organizer).build();
         venue = venueRepository.save(venue);
 
-        Court court = Court.builder().venue(venue).courtNumber(1).pricePerHourSgd(new BigDecimal("15.00")).active(true).build();
-        court = courtRepository.save(court);
+        Activity activity = Activity.builder()
+                .org(null).venue(venue).title("Test Activity")
+                .startDate(LocalDate.now()).endDate(LocalDate.now())
+                .startHour(10).endHour(12).status("PUBLISHED")
+                .pricePerHourSgd(new BigDecimal("15.00"))
+                .build();
+        activity = activityRepository.save(activity);
 
-        TimeSlot slot = TimeSlot.builder().court(court).slotDate(LocalDate.now()).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).status(SlotStatus.AVAILABLE).build();
+        TimeSlot slot = TimeSlot.builder().activity(activity).slotDate(LocalDate.now()).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).status(SlotStatus.AVAILABLE).build();
         timeSlotRepository.save(slot);
     }
 
     @Test
     void createBooking_success() throws Exception {
-        Court court = courtRepository.findAll().iterator().next();
         TimeSlot slot = timeSlotRepository.findAll().iterator().next();
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(court.getId());
         req.setTimeSlotId(slot.getId());
 
         mockMvc.perform(post("/bookings")
@@ -87,13 +90,11 @@ class BookingIntegrationTest {
 
     @Test
     void createBooking_slotUnavailable_fails() throws Exception {
-        Court court = courtRepository.findAll().iterator().next();
         TimeSlot slot = timeSlotRepository.findAll().iterator().next();
         slot.setStatus(SlotStatus.BOOKED);
         timeSlotRepository.save(slot);
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(court.getId());
         req.setTimeSlotId(slot.getId());
 
         mockMvc.perform(post("/bookings")
@@ -114,11 +115,9 @@ class BookingIntegrationTest {
 
     @Test
     void cancelBooking_success() throws Exception {
-        Court court = courtRepository.findAll().iterator().next();
         TimeSlot slot = timeSlotRepository.findAll().iterator().next();
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(court.getId());
         req.setTimeSlotId(slot.getId());
 
         String createResponse = mockMvc.perform(post("/bookings")

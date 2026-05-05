@@ -1,7 +1,6 @@
 package com.shuttlebooking.booking;
 
 import com.shuttlebooking.common.BookingStatus;
-import com.shuttlebooking.court.Court;
 import com.shuttlebooking.timeslot.TimeSlot;
 import com.shuttlebooking.user.User;
 import com.shuttlebooking.venue.Venue;
@@ -32,10 +31,6 @@ public class Booking {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_id", nullable = false)
-    private Court court;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "venue_id", nullable = false)

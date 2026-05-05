@@ -2,7 +2,6 @@ package com.shuttlebooking.activity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import java.time.LocalDate;
 import java.util.List;
 
 public interface ActivityRepository extends JpaRepository<Activity, Long> {
@@ -10,6 +9,4 @@ public interface ActivityRepository extends JpaRepository<Activity, Long> {
     List<Activity> findByVenueId(Long venueId);
 
     List<Activity> findByOrgId(Long orgId);
-
-    List<Activity> findByCourtIdAndStartDateBetween(Long courtId, LocalDate startDate, LocalDate endDate);
 }

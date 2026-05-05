@@ -3,8 +3,8 @@ package com.shuttlebooking.booking;
 import com.shuttlebooking.common.BusinessException;
 import com.shuttlebooking.common.BookingStatus;
 import com.shuttlebooking.common.SlotStatus;
-import com.shuttlebooking.court.Court;
-import com.shuttlebooking.court.CourtRepository;
+import com.shuttlebooking.activity.Activity;
+import com.shuttlebooking.activity.ActivityRepository;
 import com.shuttlebooking.payment.PaymentService;
 import com.shuttlebooking.timeslot.TimeSlot;
 import com.shuttlebooking.timeslot.TimeSlotRepository;
@@ -37,9 +37,9 @@ class BookingServiceTest {
     @Mock
     private TimeSlotRepository timeSlotRepository;
     @Mock
-    private CourtRepository courtRepository;
-    @Mock
     private VenueRepository venueRepository;
+    @Mock
+    private ActivityRepository activityRepository;
     @Mock
     private PaymentService paymentService;
 
@@ -47,7 +47,7 @@ class BookingServiceTest {
     private BookingService bookingService;
 
     private User user;
-    private Court court;
+    private Activity activity;
     private TimeSlot slot;
     private Venue venue;
 
@@ -55,14 +55,13 @@ class BookingServiceTest {
     void setUp() {
         user = User.builder().id(1L).email("test@test.com").name("Test").build();
         venue = Venue.builder().id(1L).name("Test Venue").active(true).build();
-        court = Court.builder().id(1L).venue(venue).courtNumber(1).pricePerHourSgd(new BigDecimal("10.00")).active(true).build();
-        slot = TimeSlot.builder().id(1L).court(court).slotDate(LocalDate.now()).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).status(SlotStatus.AVAILABLE).build();
+        activity = Activity.builder().id(1L).venue(venue).pricePerHourSgd(new BigDecimal("10.00")).status("PUBLISHED").build();
+        slot = TimeSlot.builder().id(1L).activity(activity).slotDate(LocalDate.now()).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).status(SlotStatus.AVAILABLE).build();
     }
 
     @Test
     void createBooking_success() {
         when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
-        when(courtRepository.findById(1L)).thenReturn(Optional.of(court));
         when(bookingRepository.save(any())).thenAnswer(inv -> {
             Booking b = inv.getArgument(0);
             b.setId(1L);
@@ -70,7 +69,6 @@ class BookingServiceTest {
         });
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(1L);
         req.setTimeSlotId(1L);
 
         Booking result = bookingService.createBooking(req, user);
@@ -90,28 +88,25 @@ class BookingServiceTest {
         when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(1L);
         req.setTimeSlotId(1L);
 
         assertThrows(BusinessException.class, () -> bookingService.createBooking(req, user));
     }
 
     @Test
-    void createBooking_courtMismatch_throwsException() {
-        Court otherCourt = Court.builder().id(99L).venue(venue).build();
-        when(timeSlotRepository.findByIdWithLock(1L)).thenReturn(Optional.of(slot));
-        when(courtRepository.findById(99L)).thenReturn(Optional.of(otherCourt));
+    void createBooking_noActivity_throwsException() {
+        TimeSlot noActivitySlot = TimeSlot.builder().id(2L).activity(null).slotDate(LocalDate.now()).startTime(LocalTime.of(10, 0)).endTime(LocalTime.of(11, 0)).status(SlotStatus.AVAILABLE).build();
+        when(timeSlotRepository.findByIdWithLock(2L)).thenReturn(Optional.of(noActivitySlot));
 
         BookingRequest req = new BookingRequest();
-        req.setCourtId(99L);
-        req.setTimeSlotId(1L);
+        req.setTimeSlotId(2L);
 
         assertThrows(BusinessException.class, () -> bookingService.createBooking(req, user));
     }
 
     @Test
     void cancelBooking_success() {
-        Booking booking = Booking.builder().id(1L).user(user).court(court).venue(venue).timeSlot(slot).status(BookingStatus.CONFIRMED).build();
+        Booking booking = Booking.builder().id(1L).user(user).venue(venue).timeSlot(slot).activity(activity).status(BookingStatus.CONFIRMED).build();
         when(bookingRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(booking));
 
         bookingService.cancelBooking(1L, user);
@@ -131,7 +126,7 @@ class BookingServiceTest {
 
     @Test
     void getMyBookings_returnsList() {
-        Booking b1 = Booking.builder().id(1L).venue(venue).court(court).timeSlot(slot).status(BookingStatus.CONFIRMED).build();
+        Booking b1 = Booking.builder().id(1L).venue(venue).timeSlot(slot).activity(activity).status(BookingStatus.CONFIRMED).build();
         when(bookingRepository.findByUserIdOrderByCreatedAtDesc(1L)).thenReturn(List.of(b1));
 
         List<BookingResponse> result = bookingService.getMyBookings(user);

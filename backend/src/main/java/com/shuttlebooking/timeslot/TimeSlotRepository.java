@@ -1,6 +1,5 @@
 package com.shuttlebooking.timeslot;
 
-import com.shuttlebooking.common.SlotStatus;
 import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Lock;
@@ -14,10 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface TimeSlotRepository extends JpaRepository<TimeSlot, Long> {
-
-    List<TimeSlot> findByCourtIdAndSlotDate(Long courtId, LocalDate slotDate);
-
-    List<TimeSlot> findByCourtIdAndSlotDateAndStatus(Long courtId, LocalDate slotDate, SlotStatus status);
 
     List<TimeSlot> findByActivityIdAndSlotDate(Long activityId, LocalDate slotDate);
 

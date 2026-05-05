@@ -85,7 +85,7 @@ export default function MyBookingsPage() {
                   <div>
                     <h3 className="font-medium">{booking.venueName}</h3>
                     <p className="text-sm text-gray-500">
-                      Court {booking.courtNumber} | {booking.slotDate} {booking.startTime?.slice(0, 5)} - {booking.endTime?.slice(0, 5)}
+                      {booking.courtDescription ? `${booking.courtDescription} | ` : ''}{booking.slotDate} {booking.startTime?.slice(0, 5)} - {booking.endTime?.slice(0, 5)}
                     </p>
                     <p className="text-sm text-gray-500">Ref: {booking.bookingRef.slice(0, 8)}...</p>
                   </div>

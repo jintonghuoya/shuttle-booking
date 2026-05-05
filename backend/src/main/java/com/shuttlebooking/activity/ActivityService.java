@@ -2,8 +2,6 @@ package com.shuttlebooking.activity;
 
 import com.shuttlebooking.common.BusinessException;
 import com.shuttlebooking.common.SlotStatus;
-import com.shuttlebooking.court.Court;
-import com.shuttlebooking.court.CourtRepository;
 import com.shuttlebooking.organization.OrgMemberRepository;
 import com.shuttlebooking.organization.Organization;
 import com.shuttlebooking.organization.OrganizationRepository;
@@ -29,7 +27,6 @@ public class ActivityService {
     private final OrganizationRepository organizationRepository;
     private final OrgMemberRepository orgMemberRepository;
     private final VenueRepository venueRepository;
-    private final CourtRepository courtRepository;
     private final TimeSlotRepository timeSlotRepository;
 
     @Transactional
@@ -46,18 +43,6 @@ public class ActivityService {
                 .filter(Venue::isActive)
                 .orElseThrow(() -> new BusinessException("Venue not found"));
 
-        Court court = null;
-        if (req.getCourtId() != null) {
-            court = courtRepository.findById(req.getCourtId())
-                    .orElseThrow(() -> new BusinessException("Court not found"));
-            if (!court.getVenue().getId().equals(venue.getId())) {
-                throw new BusinessException("Court does not belong to this venue");
-            }
-            if (!court.isActive()) {
-                throw new BusinessException("Court is not active");
-            }
-        }
-
         if (req.getStartDate().isAfter(req.getEndDate())) {
             throw new BusinessException("Start date must be before end date");
         }
@@ -69,7 +54,7 @@ public class ActivityService {
         Activity activity = Activity.builder()
                 .org(org)
                 .venue(venue)
-                .court(court)
+                .courtDescription(req.getCourtDescription())
                 .title(req.getTitle())
                 .description(req.getDescription())
                 .startDate(req.getStartDate())
@@ -77,6 +62,7 @@ public class ActivityService {
                 .startHour(req.getStartHour())
                 .endHour(req.getEndHour())
                 .status("PUBLISHED")
+                .pricePerHourSgd(req.getPricePerHourSgd())
                 .build();
         activity = activityRepository.save(activity);
 
@@ -86,7 +72,6 @@ public class ActivityService {
         while (!currentDate.isAfter(req.getEndDate())) {
             for (int hour = req.getStartHour(); hour < req.getEndHour(); hour++) {
                 TimeSlot slot = TimeSlot.builder()
-                        .court(court)
                         .slotDate(currentDate)
                         .startTime(LocalTime.of(hour, 0))
                         .endTime(LocalTime.of(hour + 1, 0))

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
@@ -17,7 +18,7 @@ public class ActivityRequest {
     @NotNull
     private Long venueId;
 
-    private Long courtId;
+    private String courtDescription;
 
     @NotBlank
     private String title;
@@ -39,4 +40,7 @@ public class ActivityRequest {
     @Min(1)
     @Max(23)
     private Integer endHour;
+
+    @NotNull
+    private BigDecimal pricePerHourSgd;
 }

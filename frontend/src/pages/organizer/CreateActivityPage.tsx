@@ -1,23 +1,23 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import client from '../../api/client';
-import type { Venue, Court } from '../../api/types';
+import type { Venue } from '../../api/types';
 
 export default function CreateActivityPage() {
   const { orgId } = useParams<{ orgId: string }>();
   const navigate = useNavigate();
 
   const [venues, setVenues] = useState<Venue[]>([]);
-  const [courts, setCourts] = useState<Court[]>([]);
   const [selectedVenue, setSelectedVenue] = useState<number | null>(null);
-  const [selectedCourt, setSelectedCourt] = useState<number | null>(null);
 
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
+  const [courtDescription, setCourtDescription] = useState('');
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
   const [startHour, setStartHour] = useState(9);
   const [endHour, setEndHour] = useState(21);
+  const [pricePerHour, setPricePerHour] = useState('');
 
   const [submitting, setSubmitting] = useState(false);
 
@@ -26,34 +26,22 @@ export default function CreateActivityPage() {
       .then(res => setVenues(res.data.data.content || res.data.data));
   }, []);
 
-  useEffect(() => {
-    if (!selectedVenue) {
-      setCourts([]);
-      setSelectedCourt(null);
-      return;
-    }
-    client.get(`/venues/${selectedVenue}/courts`)
-      .then(res => {
-        setCourts(res.data.data);
-        setSelectedCourt(null);
-      });
-  }, [selectedVenue]);
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!orgId || !selectedVenue) return;
+    if (!orgId || !selectedVenue || !pricePerHour) return;
     setSubmitting(true);
     try {
       await client.post('/activities', {
         orgId: Number(orgId),
         venueId: selectedVenue,
-        ...(selectedCourt ? { courtId: selectedCourt } : {}),
         title,
         description,
+        courtDescription: courtDescription || null,
         startDate,
         endDate,
         startHour,
         endHour,
+        pricePerHourSgd: parseFloat(pricePerHour),
       });
       navigate(`/organizer/orgs/${orgId}`);
     } catch (err: any) {
@@ -114,18 +102,28 @@ export default function CreateActivityPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Court <span className="text-gray-400 font-normal">(optional)</span></label>
-            <select
-              value={selectedCourt ?? ''}
-              onChange={e => setSelectedCourt(Number(e.target.value) || null)}
-              disabled={!selectedVenue}
-              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-            >
-              <option value="">Not specified</option>
-              {courts.map(c => (
-                <option key={c.id} value={c.id}>Court {c.courtNumber} - ${c.pricePerHourSgd}/hr</option>
-              ))}
-            </select>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Court Description <span className="text-gray-400 font-normal">(optional, e.g. "Court 3" or "Courts 1-2")</span></label>
+            <input
+              type="text"
+              value={courtDescription}
+              onChange={e => setCourtDescription(e.target.value)}
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g. Court 3"
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Price per Hour (SGD)</label>
+            <input
+              type="number"
+              step="0.50"
+              min="0"
+              value={pricePerHour}
+              onChange={e => setPricePerHour(e.target.value)}
+              required
+              className="w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="e.g. 15.00"
+            />
           </div>
 
           <div className="grid grid-cols-2 gap-4">

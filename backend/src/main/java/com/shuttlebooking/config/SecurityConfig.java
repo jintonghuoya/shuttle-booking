@@ -43,7 +43,6 @@ public class SecurityConfig {
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/auth/**")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher("/payments/webhook")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/venues/**")).permitAll()
-                .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/courts/**")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/venues")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/orgs/**")).permitAll()
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.GET, "/activities/**")).permitAll()
@@ -53,7 +52,6 @@ public class SecurityConfig {
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/activities")).hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/venues")).hasAnyRole("ORGANIZER", "ADMIN")
                 .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.PUT, "/venues/**")).hasAnyRole("ORGANIZER", "ADMIN")
-                .requestMatchers(AntPathRequestMatcher.antMatcher(HttpMethod.POST, "/venues/*/courts")).hasAnyRole("ORGANIZER", "ADMIN")
                 .anyRequest().authenticated()
             )
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);

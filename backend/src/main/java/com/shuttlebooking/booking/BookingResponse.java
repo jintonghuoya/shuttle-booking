@@ -17,19 +17,21 @@ public class BookingResponse {
     private BookingStatus status;
     private BigDecimal totalAmount;
     private String venueName;
-    private String courtName;
-    private int courtNumber;
+    private String courtDescription;
     private LocalDate slotDate;
     private LocalTime startTime;
     private LocalTime endTime;
     private Instant createdAt;
 
     public static BookingResponse from(Booking b) {
+        String courtDesc = null;
+        if (b.getActivity() != null) {
+            courtDesc = b.getActivity().getCourtDescription();
+        }
         return new BookingResponse(
                 b.getId(), b.getBookingRef(), b.getStatus(), b.getTotalAmount(),
                 b.getVenue().getName(),
-                b.getCourt().getName() != null ? b.getCourt().getName() : "Court " + b.getCourt().getCourtNumber(),
-                b.getCourt().getCourtNumber(),
+                courtDesc,
                 b.getTimeSlot().getSlotDate(), b.getTimeSlot().getStartTime(), b.getTimeSlot().getEndTime(),
                 b.getCreatedAt()
         );

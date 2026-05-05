@@ -17,14 +17,7 @@ export interface Venue {
   active: boolean;
   submittedByName: string;
   distanceKm: number | null;
-}
-
-export interface Court {
-  id: number;
-  courtNumber: number;
-  name: string;
-  pricePerHourSgd: number;
-  active: boolean;
+  numberOfCourts: number | null;
 }
 
 export interface TimeSlot {
@@ -41,8 +34,7 @@ export interface Booking {
   status: 'PENDING_PAYMENT' | 'CONFIRMED' | 'CANCELLED' | 'REFUNDED' | 'EXPIRED';
   totalAmount: number;
   venueName: string;
-  courtName: string;
-  courtNumber: number;
+  courtDescription: string | null;
   slotDate: string;
   startTime: string;
   endTime: string;
@@ -76,8 +68,7 @@ export interface Activity {
   org: Organization;
   venueId: number;
   venueName: string;
-  courtId: number;
-  courtNumber: number;
+  courtDescription: string | null;
   title: string;
   description?: string;
   startDate: string;
@@ -85,6 +76,7 @@ export interface Activity {
   startHour: number;
   endHour: number;
   status: string;
+  pricePerHourSgd: number;
   createdAt: string;
 }
 

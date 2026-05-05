@@ -5,8 +5,6 @@ import com.shuttlebooking.activity.ActivityRepository;
 import com.shuttlebooking.common.BookingStatus;
 import com.shuttlebooking.common.BusinessException;
 import com.shuttlebooking.common.SlotStatus;
-import com.shuttlebooking.court.Court;
-import com.shuttlebooking.court.CourtRepository;
 import com.shuttlebooking.payment.PaymentService;
 import com.shuttlebooking.timeslot.TimeSlot;
 import com.shuttlebooking.timeslot.TimeSlotRepository;
@@ -28,7 +26,6 @@ public class BookingService {
 
     private final BookingRepository bookingRepository;
     private final TimeSlotRepository timeSlotRepository;
-    private final CourtRepository courtRepository;
     private final VenueRepository venueRepository;
     private final ActivityRepository activityRepository;
     private final PaymentService paymentService;
@@ -44,32 +41,19 @@ public class BookingService {
             throw new BusinessException("Time slot is not available");
         }
 
-        // Derive court from request, time slot, or activity
-        Court court;
-        if (req.getCourtId() != null) {
-            court = courtRepository.findById(req.getCourtId())
-                    .orElseThrow(() -> new BusinessException("Court not found"));
-            if (slot.getCourt() != null && !slot.getCourt().getId().equals(court.getId())) {
-                throw new BusinessException("Time slot does not belong to this court");
-            }
-        } else if (slot.getCourt() != null) {
-            court = slot.getCourt();
-        } else {
-            throw new BusinessException("No court assigned to this time slot");
-        }
-
         Activity activity = null;
-        if (req.getActivityId() != null) {
+        if (slot.getActivity() != null) {
+            activity = slot.getActivity();
+        } else if (req.getActivityId() != null) {
             activity = activityRepository.findById(req.getActivityId())
                     .orElseThrow(() -> new BusinessException("Activity not found"));
-
             if (!"PUBLISHED".equals(activity.getStatus())) {
                 throw new BusinessException("Activity is not published");
             }
+        }
 
-            if (slot.getActivity() == null || !slot.getActivity().getId().equals(activity.getId())) {
-                throw new BusinessException("Time slot does not belong to this activity");
-            }
+        if (activity == null) {
+            throw new BusinessException("Time slot is not associated with an activity");
         }
 
         // Hold the slot
@@ -80,12 +64,11 @@ public class BookingService {
         Booking booking = Booking.builder()
                 .bookingRef(UUID.randomUUID().toString())
                 .user(user)
-                .court(court)
-                .venue(court.getVenue())
+                .venue(activity.getVenue())
                 .timeSlot(slot)
                 .activity(activity)
                 .status(BookingStatus.PENDING_PAYMENT)
-                .totalAmount(court.getPricePerHourSgd())
+                .totalAmount(activity.getPricePerHourSgd())
                 .build();
 
         return bookingRepository.save(booking);

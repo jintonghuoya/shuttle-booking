@@ -3,7 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import client from '../api/client';
 import { useAuth } from '../context/AuthContext';
-import type { Venue, Activity, Court } from '../api/types';
+import type { Venue, Activity } from '../api/types';
 
 export default function VenueDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -12,7 +12,6 @@ export default function VenueDetailPage() {
 
   const [venue, setVenue] = useState<Venue | null>(null);
   const [activities, setActivities] = useState<Activity[]>([]);
-  const [courts, setCourts] = useState<Court[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -21,11 +20,9 @@ export default function VenueDetailPage() {
     Promise.all([
       client.get(`/venues/${id}`),
       client.get(`/venues/${id}/activities`),
-      client.get(`/venues/${id}/courts`),
-    ]).then(([venueRes, activitiesRes, courtsRes]) => {
+    ]).then(([venueRes, activitiesRes]) => {
       setVenue(venueRes.data.data);
       setActivities(activitiesRes.data.data || []);
-      setCourts(courtsRes.data.data || []);
     }).finally(() => setLoading(false));
   }, [id]);
 
@@ -62,6 +59,9 @@ export default function VenueDetailPage() {
             <div className="flex-1">
               <h1 className="text-2xl font-bold">{venue.name}</h1>
               <p className="text-gray-500">{venue.address}</p>
+              {venue.numberOfCourts && (
+                <p className="text-sm text-gray-400 mt-1">{venue.numberOfCourts} courts</p>
+              )}
             </div>
             <button
               onClick={handleToggleFollow}
@@ -104,21 +104,6 @@ export default function VenueDetailPage() {
         {venue.description && <p className="text-gray-600">{venue.description}</p>}
         {venue.phone && <p className="text-gray-600">Phone: {venue.phone}</p>}
 
-        {/* Courts */}
-        {courts.length > 0 && (
-          <div className="bg-white rounded-lg shadow-sm p-4">
-            <h2 className="text-lg font-semibold mb-4">Courts ({courts.length})</h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {courts.map(court => (
-                <div key={court.id} className="border border-gray-200 rounded-lg p-3">
-                  <p className="font-medium">Court {court.courtNumber}</p>
-                  <p className="text-sm text-gray-500">${court.pricePerHourSgd}/hr</p>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
         {/* Activities */}
         <div className="bg-white rounded-lg shadow-sm p-4">
           <h2 className="text-lg font-semibold mb-4">Activities at this Venue</h2>
@@ -136,7 +121,7 @@ export default function VenueDetailPage() {
                     <div>
                       <h3 className="font-medium text-blue-600">{activity.title}</h3>
                       <p className="text-sm text-gray-500 mt-1">
-                        {activity.org?.name}{activity.courtNumber ? ` · Court ${activity.courtNumber}` : ''}
+                        {activity.org?.name}{activity.courtDescription ? ` · ${activity.courtDescription}` : ''}
                       </p>
                       <p className="text-sm text-gray-500">
                         {activity.startDate} ~ {activity.endDate} · {activity.startHour}:00 - {activity.endHour}:00

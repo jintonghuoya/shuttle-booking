@@ -3,8 +3,6 @@ package com.shuttlebooking.activity;
 import com.shuttlebooking.common.BusinessException;
 import com.shuttlebooking.common.SlotStatus;
 import java.util.stream.StreamSupport;
-import com.shuttlebooking.court.Court;
-import com.shuttlebooking.court.CourtRepository;
 import com.shuttlebooking.organization.OrgMemberRepository;
 import com.shuttlebooking.organization.Organization;
 import com.shuttlebooking.organization.OrganizationRepository;
@@ -20,13 +18,13 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
@@ -41,8 +39,6 @@ class ActivityServiceTest {
     @Mock
     private VenueRepository venueRepository;
     @Mock
-    private CourtRepository courtRepository;
-    @Mock
     private TimeSlotRepository timeSlotRepository;
 
     @InjectMocks
@@ -51,7 +47,6 @@ class ActivityServiceTest {
     private User user;
     private Organization org;
     private Venue venue;
-    private Court court;
     private ActivityRequest request;
 
     @BeforeEach
@@ -59,18 +54,17 @@ class ActivityServiceTest {
         user = User.builder().id(1L).email("test@test.com").name("Test").build();
         org = Organization.builder().id(1L).name("Test Org").active(true).build();
         venue = Venue.builder().id(1L).name("Test Venue").active(true).build();
-        court = Court.builder().id(1L).venue(venue).courtNumber(1).active(true).build();
 
         request = new ActivityRequest();
         request.setOrgId(1L);
         request.setVenueId(1L);
-        request.setCourtId(1L);
         request.setTitle("Test Activity");
         request.setDescription("Description");
         request.setStartDate(LocalDate.of(2026, 5, 1));
         request.setEndDate(LocalDate.of(2026, 5, 1));
         request.setStartHour(10);
         request.setEndHour(12);
+        request.setPricePerHourSgd(new BigDecimal("15.00"));
     }
 
     @Test
@@ -78,7 +72,6 @@ class ActivityServiceTest {
         when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
         when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
         when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        when(courtRepository.findById(1L)).thenReturn(Optional.of(court));
         when(activityRepository.save(any())).thenAnswer(inv -> {
             Activity a = inv.getArgument(0);
             a.setId(1L);
@@ -92,10 +85,27 @@ class ActivityServiceTest {
         assertEquals("PUBLISHED", result.getStatus());
         assertEquals(org, result.getOrg());
         assertEquals(venue, result.getVenue());
-        assertEquals(court, result.getCourt());
+        assertEquals(new BigDecimal("15.00"), result.getPricePerHourSgd());
         // 1 day * 2 hours = 2 slots
         verify(timeSlotRepository).saveAll(argThat(slots ->
                 StreamSupport.stream(slots.spliterator(), false).count() == 2));
+    }
+
+    @Test
+    void create_withCourtDescription_success() {
+        request.setCourtDescription("Court 3");
+        when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
+        when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
+        when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
+        when(activityRepository.save(any())).thenAnswer(inv -> {
+            Activity a = inv.getArgument(0);
+            a.setId(1L);
+            return a;
+        });
+
+        Activity result = activityService.create(1L, request, user);
+
+        assertEquals("Court 3", result.getCourtDescription());
     }
 
     @Test
@@ -124,35 +134,10 @@ class ActivityServiceTest {
     }
 
     @Test
-    void create_courtNotFound_throwsException() {
-        when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
-        when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
-        when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        when(courtRepository.findById(99L)).thenReturn(Optional.empty());
-        request.setCourtId(99L);
-
-        assertThrows(BusinessException.class, () -> activityService.create(1L, request, user));
-    }
-
-    @Test
-    void create_courtNotInVenue_throwsException() {
-        Venue otherVenue = Venue.builder().id(2L).active(true).build();
-        Court otherCourt = Court.builder().id(2L).venue(otherVenue).active(true).build();
-        when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
-        when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
-        when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        when(courtRepository.findById(2L)).thenReturn(Optional.of(otherCourt));
-        request.setCourtId(2L);
-
-        assertThrows(BusinessException.class, () -> activityService.create(1L, request, user));
-    }
-
-    @Test
     void create_startDateAfterEndDate_throwsException() {
         when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
         when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
         when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        when(courtRepository.findById(1L)).thenReturn(Optional.of(court));
         request.setStartDate(LocalDate.of(2026, 5, 10));
         request.setEndDate(LocalDate.of(2026, 5, 1));
 
@@ -164,30 +149,10 @@ class ActivityServiceTest {
         when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
         when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
         when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        when(courtRepository.findById(1L)).thenReturn(Optional.of(court));
         request.setStartHour(12);
         request.setEndHour(10);
 
         assertThrows(BusinessException.class, () -> activityService.create(1L, request, user));
-    }
-
-    @Test
-    void create_withoutCourt_success() {
-        when(organizationRepository.findById(1L)).thenReturn(Optional.of(org));
-        when(orgMemberRepository.existsByOrgIdAndUserId(1L, 1L)).thenReturn(true);
-        when(venueRepository.findById(1L)).thenReturn(Optional.of(venue));
-        request.setCourtId(null);
-        when(activityRepository.save(any())).thenAnswer(inv -> {
-            Activity a = inv.getArgument(0);
-            a.setId(2L);
-            return a;
-        });
-
-        Activity result = activityService.create(1L, request, user);
-
-        assertNotNull(result);
-        assertNull(result.getCourt());
-        assertEquals("Test Activity", result.getTitle());
     }
 
     @Test

@@ -44,6 +44,12 @@ public class PaymentService {
 
         com.stripe.Stripe.apiKey = stripeSecretKey;
 
+        String productName = booking.getVenue().getName();
+        if (booking.getActivity() != null && booking.getActivity().getCourtDescription() != null) {
+            productName += " - " + booking.getActivity().getCourtDescription();
+        }
+        productName += " " + booking.getTimeSlot().getSlotDate() + " " + booking.getTimeSlot().getStartTime();
+
         SessionCreateParams params = SessionCreateParams.builder()
                 .setMode(SessionCreateParams.Mode.PAYMENT)
                 .setSuccessUrl("http://localhost:3001/bookings?payment=success&ref=" + booking.getBookingRef())
@@ -53,7 +59,7 @@ public class PaymentService {
                                 .setCurrency("sgd")
                                 .setUnitAmount(booking.getTotalAmount().movePointRight(2).longValue())
                                 .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                        .setName("Court " + booking.getCourt().getCourtNumber() + " - " + booking.getTimeSlot().getSlotDate() + " " + booking.getTimeSlot().getStartTime())
+                                        .setName(productName)
                                         .build())
                                 .build())
                         .setQuantity(1L)

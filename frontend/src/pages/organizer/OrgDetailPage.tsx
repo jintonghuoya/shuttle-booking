@@ -133,7 +133,7 @@ export default function OrgDetailPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{activity.title}</h3>
-                      <p className="text-sm text-gray-500">{activity.venueName}{activity.courtNumber ? ` - Court ${activity.courtNumber}` : ''}</p>
+                      <p className="text-sm text-gray-500">{activity.venueName}{activity.courtDescription ? ` - ${activity.courtDescription}` : ''}</p>
                       <p className="text-sm text-gray-500">
                         {activity.startDate} - {activity.endDate} | {String(activity.startHour).padStart(2, '0')}:00 - {String(activity.endHour).padStart(2, '0')}:00
                       </p>

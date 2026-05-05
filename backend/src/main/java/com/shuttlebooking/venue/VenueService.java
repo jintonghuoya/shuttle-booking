@@ -60,6 +60,7 @@ public class VenueService {
                 .longitude(req.getLongitude())
                 .description(req.getDescription())
                 .phone(req.getPhone())
+                .numberOfCourts(req.getNumberOfCourts())
                 .active(false)
                 .submittedBy(organizer)
                 .build();
@@ -83,6 +84,7 @@ public class VenueService {
                 .longitude(req.getLongitude())
                 .description(req.getDescription())
                 .phone(req.getPhone())
+                .numberOfCourts(req.getNumberOfCourts())
                 .active(true)
                 .submittedBy(admin)
                 .approvedBy(admin)
@@ -106,6 +108,7 @@ public class VenueService {
         venue.setLongitude(req.getLongitude());
         venue.setDescription(req.getDescription());
         venue.setPhone(req.getPhone());
+        venue.setNumberOfCourts(req.getNumberOfCourts());
         venue = venueRepository.save(venue);
 
         if (!venue.isActive()) {

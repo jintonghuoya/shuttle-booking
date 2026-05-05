@@ -1,10 +1,10 @@
 package com.shuttlebooking.activity;
 
 import com.shuttlebooking.organization.OrganizationResponse;
-import com.shuttlebooking.venue.VenueResponse;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 
@@ -15,8 +15,7 @@ public class ActivityResponse {
     private OrganizationResponse org;
     private Long venueId;
     private String venueName;
-    private Long courtId;
-    private Integer courtNumber;
+    private String courtDescription;
     private String title;
     private String description;
     private LocalDate startDate;
@@ -24,6 +23,7 @@ public class ActivityResponse {
     private Integer startHour;
     private Integer endHour;
     private String status;
+    private BigDecimal pricePerHourSgd;
     private Instant createdAt;
 
     public static ActivityResponse from(Activity activity) {
@@ -32,8 +32,7 @@ public class ActivityResponse {
                 activity.getOrg() != null ? OrganizationResponse.from(activity.getOrg()) : null,
                 activity.getVenue() != null ? activity.getVenue().getId() : null,
                 activity.getVenue() != null ? activity.getVenue().getName() : null,
-                activity.getCourt() != null ? activity.getCourt().getId() : null,
-                activity.getCourt() != null ? activity.getCourt().getCourtNumber() : null,
+                activity.getCourtDescription(),
                 activity.getTitle(),
                 activity.getDescription(),
                 activity.getStartDate(),
@@ -41,6 +40,7 @@ public class ActivityResponse {
                 activity.getStartHour(),
                 activity.getEndHour(),
                 activity.getStatus(),
+                activity.getPricePerHourSgd(),
                 activity.getCreatedAt()
         );
     }

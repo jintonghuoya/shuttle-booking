@@ -18,13 +18,14 @@ public class VenueResponse {
     private boolean active;
     private String submittedByName;
     private Double distanceKm;
+    private Integer numberOfCourts;
 
     public static VenueResponse from(Venue venue) {
         return new VenueResponse(venue.getId(), venue.getName(), venue.getAddress(),
                 venue.getLatitude(), venue.getLongitude(), venue.getDescription(),
                 venue.getPhone(), venue.isActive(),
                 venue.getSubmittedBy() != null ? venue.getSubmittedBy().getName() : null,
-                null);
+                null, venue.getNumberOfCourts());
     }
 
     public static VenueResponse from(Venue venue, double distanceKm) {

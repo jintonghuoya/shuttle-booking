@@ -52,9 +52,8 @@ public class Venue {
     @JoinColumn(name = "approved_by")
     private User approvedBy;
 
-    @OneToMany(mappedBy = "venue", cascade = CascadeType.ALL)
-    @Builder.Default
-    private List<com.shuttlebooking.court.Court> courts = new ArrayList<>();
+    @Column(name = "number_of_courts")
+    private Integer numberOfCourts;
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

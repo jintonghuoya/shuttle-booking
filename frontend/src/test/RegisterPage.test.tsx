@@ -32,7 +32,7 @@ describe('RegisterPage', () => {
       </BrowserRouter>
     );
 
-    expect(screen.getByText('Book courts')).toBeInTheDocument();
+    expect(screen.getByText('Join activities')).toBeInTheDocument();
     expect(screen.getByText('Submit venues (organizer)')).toBeInTheDocument();
   });
 

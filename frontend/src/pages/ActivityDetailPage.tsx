@@ -77,7 +77,7 @@ export default function ActivityDetailPage() {
           <div className="flex gap-4 mt-2 text-sm text-gray-600">
             <span>By {activity.org.name}</span>
             <span>{activity.venueName}</span>
-            {activity.courtNumber && <span>Court {activity.courtNumber}</span>}
+            {activity.courtDescription && <span>{activity.courtDescription}</span>}
           </div>
           <p className="text-sm text-gray-600 mt-1">
             {activity.startDate} - {activity.endDate} | {String(activity.startHour).padStart(2, '0')}:00 - {String(activity.endHour).padStart(2, '0')}:00

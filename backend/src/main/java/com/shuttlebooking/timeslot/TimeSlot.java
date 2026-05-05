@@ -1,7 +1,6 @@
 package com.shuttlebooking.timeslot;
 
 import com.shuttlebooking.common.SlotStatus;
-import com.shuttlebooking.court.Court;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -13,7 +12,7 @@ import java.time.LocalTime;
 
 @Entity
 @Table(name = "time_slots", uniqueConstraints = {
-    @UniqueConstraint(columnNames = {"court_id", "slot_date", "start_time"})
+    @UniqueConstraint(columnNames = {"activity_id", "slot_date", "start_time"})
 })
 @Getter
 @Setter
@@ -25,10 +24,6 @@ public class TimeSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "court_id")
-    private Court court;
 
     @Column(name = "slot_date", nullable = false)
     private LocalDate slotDate;

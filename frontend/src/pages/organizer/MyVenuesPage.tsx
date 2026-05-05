@@ -69,12 +69,6 @@ export default function MyVenuesPage() {
                   >
                     Edit Venue
                   </Link>
-                  <Link
-                    to={`/organizer/venues/${venue.id}/courts/new`}
-                    className="text-blue-600 hover:underline"
-                  >
-                    Add Court
-                  </Link>
                 </div>
               </div>
             ))}

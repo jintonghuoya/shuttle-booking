@@ -18,7 +18,7 @@ describe('API types', () => {
   it('Venue has correct shape', () => {
     const venue: Venue = {
       id: 1,
-      name: 'Court',
+      name: 'Test Venue',
       address: '123 Singapore',
       latitude: 1.35,
       longitude: 103.82,
@@ -27,6 +27,7 @@ describe('API types', () => {
       active: true,
       submittedByName: 'Org',
       distanceKm: 2.5,
+      numberOfCourts: 6,
     };
     expectTypeOf(venue.latitude).toBeNumber();
     expectTypeOf(venue.distanceKm).toEqualTypeOf<number | null>();
@@ -39,8 +40,7 @@ describe('API types', () => {
       status: 'CONFIRMED',
       totalAmount: 15,
       venueName: 'V',
-      courtName: 'C',
-      courtNumber: 1,
+      courtDescription: 'Court 3',
       slotDate: '2026-05-05',
       startTime: '10:00',
       endTime: '11:00',
