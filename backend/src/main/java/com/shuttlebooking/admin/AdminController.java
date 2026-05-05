@@ -6,6 +6,10 @@ import com.shuttlebooking.organization.OrganizationResponse;
 import com.shuttlebooking.organization.OrganizationService;
 import com.shuttlebooking.user.User;
 import com.shuttlebooking.user.UserResponse;
+import com.shuttlebooking.venue.VenueRequest;
+import com.shuttlebooking.venue.VenueResponse;
+import com.shuttlebooking.venue.VenueService;
+import jakarta.validation.Valid;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,6 +24,7 @@ public class AdminController {
 
     private final AdminService adminService;
     private final OrganizationService organizationService;
+    private final VenueService venueService;
 
     @GetMapping("/approvals")
     public ApiResponse<List<ApprovalResponse>> pendingApprovals() {
@@ -57,6 +62,13 @@ public class AdminController {
     @PutMapping("/users/{id}/toggle")
     public ApiResponse<UserResponse> toggleUser(@PathVariable Long id, @AuthenticationPrincipal User user) {
         return ApiResponse.ok(adminService.toggleUser(id, user));
+    }
+
+    @PostMapping("/venues")
+    public ApiResponse<VenueResponse> createVenue(
+            @Valid @RequestBody VenueRequest req,
+            @AuthenticationPrincipal User user) {
+        return ApiResponse.ok("Venue created", venueService.createDirectly(req, user));
     }
 
     @GetMapping("/org-approvals")

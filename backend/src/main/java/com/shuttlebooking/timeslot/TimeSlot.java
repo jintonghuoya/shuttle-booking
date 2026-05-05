@@ -5,6 +5,8 @@ import com.shuttlebooking.court.Court;
 import jakarta.persistence.*;
 import lombok.*;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -48,6 +50,7 @@ public class TimeSlot {
     @JoinColumn(name = "activity_id")
     private com.shuttlebooking.activity.Activity activity;
 
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private Instant createdAt;
 }

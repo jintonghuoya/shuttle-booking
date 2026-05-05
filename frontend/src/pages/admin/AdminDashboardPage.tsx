@@ -64,6 +64,13 @@ export default function AdminDashboardPage() {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <Link
+                to="/admin/venues/new"
+                className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition block"
+              >
+                <h2 className="text-lg font-semibold mb-1">Create Venue</h2>
+                <p className="text-gray-500 text-sm">Add a new venue directly (active immediately)</p>
+              </Link>
+              <Link
                 to="/admin/approvals"
                 className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition block"
               >

@@ -37,6 +37,6 @@ public class ActivityRequest {
 
     @NotNull
     @Min(1)
-    @Max(24)
+    @Max(23)
     private Integer endHour;
 }

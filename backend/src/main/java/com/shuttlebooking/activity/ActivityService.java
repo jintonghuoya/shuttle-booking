@@ -139,7 +139,6 @@ public class ActivityService {
         List<TimeSlot> slots = timeSlotRepository.findByActivityId(id);
         for (TimeSlot slot : slots) {
             if (slot.getStatus() == SlotStatus.AVAILABLE) {
-                slot.setStatus(SlotStatus.AVAILABLE);
                 slot.setActivity(null);
                 timeSlotRepository.save(slot);
             }

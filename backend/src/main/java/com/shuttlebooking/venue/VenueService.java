@@ -75,6 +75,23 @@ public class VenueService {
     }
 
     @Transactional
+    public VenueResponse createDirectly(VenueRequest req, User admin) {
+        Venue venue = Venue.builder()
+                .name(req.getName())
+                .address(req.getAddress())
+                .latitude(req.getLatitude())
+                .longitude(req.getLongitude())
+                .description(req.getDescription())
+                .phone(req.getPhone())
+                .active(true)
+                .submittedBy(admin)
+                .approvedBy(admin)
+                .build();
+        venue = venueRepository.save(venue);
+        return VenueResponse.from(venue);
+    }
+
+    @Transactional
     public VenueResponse update(Long id, VenueRequest req, User organizer) {
         Venue venue = venueRepository.findById(id)
                 .orElseThrow(() -> new BusinessException("Venue not found"));

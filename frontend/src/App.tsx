@@ -24,6 +24,7 @@ import AdminApprovalsPage from './pages/admin/AdminApprovalsPage';
 import AdminUsersPage from './pages/admin/AdminUsersPage';
 import AdminVenueApprovalsPage from './pages/admin/AdminVenueApprovalsPage';
 import AdminOrgApprovalsPage from './pages/admin/AdminOrgApprovalsPage';
+import AdminCreateVenuePage from './pages/admin/AdminCreateVenuePage';
 
 const queryClient = new QueryClient();
 
@@ -62,6 +63,7 @@ function App() {
             <Route path="/admin/venue-approvals" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminVenueApprovalsPage /></ProtectedRoute>} />
             <Route path="/admin/org-approvals" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminOrgApprovalsPage /></ProtectedRoute>} />
             <Route path="/admin/users" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminUsersPage /></ProtectedRoute>} />
+            <Route path="/admin/venues/new" element={<ProtectedRoute requiredRole="ROLE_ADMIN"><AdminCreateVenuePage /></ProtectedRoute>} />
           </Routes>
         </BrowserRouter>
       </AuthProvider>
