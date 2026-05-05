@@ -2,7 +2,7 @@ package com.shuttlebooking.admin;
 
 import com.shuttlebooking.approval.ApprovalResponse;
 import com.shuttlebooking.common.ApiResponse;
-import com.shuttlebooking.organization.Organization;
+import com.shuttlebooking.organization.OrganizationResponse;
 import com.shuttlebooking.organization.OrganizationService;
 import com.shuttlebooking.user.User;
 import com.shuttlebooking.user.UserResponse;
@@ -60,8 +60,9 @@ public class AdminController {
     }
 
     @GetMapping("/org-approvals")
-    public ApiResponse<List<Organization>> orgApprovals() {
-        return ApiResponse.ok(organizationService.listAll());
+    public ApiResponse<List<OrganizationResponse>> orgApprovals() {
+        return ApiResponse.ok(organizationService.listAll().stream()
+                .map(OrganizationResponse::from).toList());
     }
 
     @Data

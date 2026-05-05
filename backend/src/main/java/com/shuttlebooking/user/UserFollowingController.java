@@ -1,8 +1,8 @@
 package com.shuttlebooking.user;
 
 import com.shuttlebooking.common.ApiResponse;
-import com.shuttlebooking.organization.Organization;
 import com.shuttlebooking.organization.OrganizationService;
+import com.shuttlebooking.organization.OrganizationResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,7 +19,8 @@ public class UserFollowingController {
     private final OrganizationService organizationService;
 
     @GetMapping("/following")
-    public ApiResponse<List<Organization>> following(@AuthenticationPrincipal User user) {
-        return ApiResponse.ok(organizationService.getFollowedOrgs(user));
+    public ApiResponse<List<OrganizationResponse>> following(@AuthenticationPrincipal User user) {
+        return ApiResponse.ok(organizationService.getFollowedOrgs(user).stream()
+                .map(OrganizationResponse::from).toList());
     }
 }

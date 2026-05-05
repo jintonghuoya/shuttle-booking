@@ -52,8 +52,8 @@ export default function OrgListPage() {
                     <h2 className="text-lg font-semibold">{org.name}</h2>
                     {org.description && <p className="text-sm text-gray-500 mt-1">{org.description}</p>}
                   </div>
-                  <span className={org.isActive ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
-                    {org.isActive ? 'Active' : 'Inactive'}
+                  <span className={org.active ? 'text-green-600 text-sm font-medium' : 'text-red-600 text-sm font-medium'}>
+                    {org.active ? 'Active' : 'Inactive'}
                   </span>
                 </div>
               </Link>

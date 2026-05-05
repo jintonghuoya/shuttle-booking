@@ -1,6 +1,6 @@
 package com.shuttlebooking.organization;
 
-import com.shuttlebooking.activity.Activity;
+import com.shuttlebooking.activity.ActivityResponse;
 import com.shuttlebooking.activity.ActivityService;
 import com.shuttlebooking.common.ApiResponse;
 import com.shuttlebooking.user.User;
@@ -22,31 +22,34 @@ public class OrganizationController {
     private final ActivityService activityService;
 
     @PostMapping
-    public ApiResponse<Organization> create(
+    public ApiResponse<OrganizationResponse> create(
             @Valid @RequestBody CreateOrgRequest req,
             @AuthenticationPrincipal User user) {
         Organization org = organizationService.create(req.getName(), req.getDescription(), user);
-        return ApiResponse.ok("Organization created", org);
+        return ApiResponse.ok("Organization created", OrganizationResponse.from(org));
     }
 
     @GetMapping
-    public ApiResponse<List<Organization>> listAll() {
-        return ApiResponse.ok(organizationService.listAll());
+    public ApiResponse<List<OrganizationResponse>> listAll() {
+        return ApiResponse.ok(organizationService.listAll().stream()
+                .map(OrganizationResponse::from).toList());
     }
 
     @GetMapping("/mine")
-    public ApiResponse<List<Organization>> myOrgs(@AuthenticationPrincipal User user) {
-        return ApiResponse.ok(organizationService.getMyOrgs(user));
+    public ApiResponse<List<OrganizationResponse>> myOrgs(@AuthenticationPrincipal User user) {
+        return ApiResponse.ok(organizationService.getMyOrgs(user).stream()
+                .map(OrganizationResponse::from).toList());
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Organization> detail(@PathVariable Long id) {
-        return ApiResponse.ok(organizationService.getById(id));
+    public ApiResponse<OrganizationResponse> detail(@PathVariable Long id) {
+        return ApiResponse.ok(OrganizationResponse.from(organizationService.getById(id)));
     }
 
     @GetMapping("/{id}/members")
-    public ApiResponse<List<OrgMember>> members(@PathVariable Long id) {
-        return ApiResponse.ok(organizationService.getMembers(id));
+    public ApiResponse<List<OrgMemberResponse>> members(@PathVariable Long id) {
+        return ApiResponse.ok(organizationService.getMembers(id).stream()
+                .map(OrgMemberResponse::from).toList());
     }
 
     @PostMapping("/{id}/members")
@@ -83,8 +86,9 @@ public class OrganizationController {
     }
 
     @GetMapping("/{id}/activities")
-    public ApiResponse<List<Activity>> activitiesByOrg(@PathVariable Long id) {
-        return ApiResponse.ok(activityService.listByOrg(id));
+    public ApiResponse<List<ActivityResponse>> activitiesByOrg(@PathVariable Long id) {
+        return ApiResponse.ok(activityService.listByOrg(id).stream()
+                .map(ActivityResponse::from).toList());
     }
 
     @Data

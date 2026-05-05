@@ -69,8 +69,8 @@ export default function OrgDetailPage() {
             <div>
               <h1 className="text-2xl font-bold">{org.name}</h1>
               {org.description && <p className="text-gray-500 mt-1">{org.description}</p>}
-              <span className={org.isActive ? 'text-green-600 text-sm' : 'text-red-600 text-sm'}>
-                {org.isActive ? 'Active' : 'Inactive'}
+              <span className={org.active ? 'text-green-600 text-sm' : 'text-red-600 text-sm'}>
+                {org.active ? 'Active' : 'Inactive'}
               </span>
             </div>
           </div>
@@ -133,7 +133,7 @@ export default function OrgDetailPage() {
                   <div className="flex justify-between items-start">
                     <div>
                       <h3 className="font-medium">{activity.title}</h3>
-                      <p className="text-sm text-gray-500">{activity.venue.name} - Court {activity.court.courtNumber}</p>
+                      <p className="text-sm text-gray-500">{activity.venueName} - Court {activity.courtNumber}</p>
                       <p className="text-sm text-gray-500">
                         {activity.startDate} - {activity.endDate} | {String(activity.startHour).padStart(2, '0')}:00 - {String(activity.endHour).padStart(2, '0')}:00
                       </p>

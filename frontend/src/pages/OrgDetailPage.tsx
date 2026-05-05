@@ -102,7 +102,7 @@ export default function OrgDetailPage() {
                 className="block bg-white rounded-lg shadow-sm p-4 hover:border-blue-300 border border-gray-200 transition"
               >
                 <h3 className="font-medium text-blue-600">{activity.title}</h3>
-                <p className="text-sm text-gray-500 mt-1">{activity.venue.name}</p>
+                <p className="text-sm text-gray-500 mt-1">{activity.venueName}</p>
                 <div className="flex gap-4 mt-2 text-sm text-gray-600">
                   <span>{activity.startDate} - {activity.endDate}</span>
                   <span>{String(activity.startHour).padStart(2, '0')}:00 - {String(activity.endHour).padStart(2, '0')}:00</span>

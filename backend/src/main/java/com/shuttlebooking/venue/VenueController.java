@@ -1,6 +1,6 @@
 package com.shuttlebooking.venue;
 
-import com.shuttlebooking.activity.Activity;
+import com.shuttlebooking.activity.ActivityResponse;
 import com.shuttlebooking.activity.ActivityService;
 import com.shuttlebooking.common.ApiResponse;
 import com.shuttlebooking.user.User;
@@ -61,7 +61,8 @@ public class VenueController {
     }
 
     @GetMapping("/{id}/activities")
-    public ApiResponse<List<Activity>> activitiesByVenue(@PathVariable Long id) {
-        return ApiResponse.ok(activityService.listByVenue(id));
+    public ApiResponse<List<ActivityResponse>> activitiesByVenue(@PathVariable Long id) {
+        return ApiResponse.ok(activityService.listByVenue(id).stream()
+                .map(ActivityResponse::from).toList());
     }
 }

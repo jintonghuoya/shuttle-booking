@@ -1,7 +1,7 @@
 package com.shuttlebooking.activity;
 
 import com.shuttlebooking.common.ApiResponse;
-import com.shuttlebooking.timeslot.TimeSlot;
+import com.shuttlebooking.timeslot.TimeSlotResponse;
 import com.shuttlebooking.user.User;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -20,23 +20,24 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @PostMapping
-    public ApiResponse<Activity> create(
+    public ApiResponse<ActivityResponse> create(
             @Valid @RequestBody ActivityRequest req,
             @AuthenticationPrincipal User user) {
         Activity activity = activityService.create(req.getOrgId(), req, user);
-        return ApiResponse.ok("Activity created", activity);
+        return ApiResponse.ok("Activity created", ActivityResponse.from(activity));
     }
 
     @GetMapping("/{id}")
-    public ApiResponse<Activity> detail(@PathVariable Long id) {
-        return ApiResponse.ok(activityService.getById(id));
+    public ApiResponse<ActivityResponse> detail(@PathVariable Long id) {
+        return ApiResponse.ok(ActivityResponse.from(activityService.getById(id)));
     }
 
     @GetMapping("/{id}/slots")
-    public ApiResponse<List<TimeSlot>> slots(
+    public ApiResponse<List<TimeSlotResponse>> slots(
             @PathVariable Long id,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
-        return ApiResponse.ok(activityService.getSlots(id, date));
+        return ApiResponse.ok(activityService.getSlots(id, date).stream()
+                .map(TimeSlotResponse::from).toList());
     }
 
     @DeleteMapping("/{id}")

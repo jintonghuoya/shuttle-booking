@@ -65,16 +65,19 @@ export interface Organization {
   name: string;
   description?: string;
   logoUrl?: string;
-  createdBy: User;
-  isActive: boolean;
+  createdByName: string;
+  createdByUserId: number;
+  active: boolean;
   createdAt: string;
 }
 
 export interface Activity {
   id: number;
   org: Organization;
-  venue: Venue;
-  court: Court;
+  venueId: number;
+  venueName: string;
+  courtId: number;
+  courtNumber: number;
   title: string;
   description?: string;
   startDate: string;
